@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema Namespace="ZATTRIBUTIANAGRAFICI_SRV" xml:lang="it" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+            <EntityType Name="Subscription" sap:semantics="subscriptions" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.String" Nullable="false" MaxLength="32" sap:label="Ab.-ID" sap:creatable="false" sap:updatable="false" sap:filterable="false"/>
+                <Property Name="user" Type="Edm.String" MaxLength="12" m:FC_TargetPath="SyndicationAuthorName" m:FC_KeepInContent="false" sap:label="Nome utente" sap:creatable="false" sap:filterable="false"/>
+                <Property Name="updated" Type="Edm.DateTime" Precision="0" m:FC_TargetPath="SyndicationUpdated" m:FC_KeepInContent="false" sap:label="Timestamp" sap:creatable="false" sap:filterable="false"/>
+                <Property Name="title" Type="Edm.String" MaxLength="255" m:FC_TargetPath="SyndicationTitle" m:FC_KeepInContent="false" sap:label="Titel" sap:filterable="false"/>
+                <Property Name="deliveryAddress" Type="Edm.String" sap:label="Lieferadresse" sap:filterable="false"/>
+                <Property Name="persistNotifications" Type="Edm.Boolean" sap:label="Benachr. persist." sap:filterable="false"/>
+                <Property Name="collection" Type="Edm.String" MaxLength="40" sap:label="Sammlung" sap:filterable="false"/>
+                <Property Name="filter" Type="Edm.String" sap:label="Filter" sap:filterable="false"/>
+                <Property Name="select" Type="Edm.String" MaxLength="255" sap:label="Markieren" sap:filterable="false"/>
+                <Property Name="changeType" Type="Edm.String" MaxLength="30" sap:label="Änderungsart"/>
+            </EntityType>
+            <EntityType Name="Notification" sap:semantics="notifications" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.String" Nullable="false" MaxLength="32" sap:label="Benachr-ID"/>
+                <Property Name="collection" Type="Edm.String" MaxLength="40" sap:label="Sammlung"/>
+                <Property Name="title" Type="Edm.String" m:FC_TargetPath="SyndicationTitle" m:FC_KeepInContent="false" sap:label="Benachr.text"/>
+                <Property Name="updated" Type="Edm.DateTime" Precision="0" m:FC_TargetPath="SyndicationUpdated" m:FC_KeepInContent="false" sap:label="Timestamp"/>
+                <Property Name="changeType" Type="Edm.String" MaxLength="30" sap:label="Änderungsart"/>
+                <Property Name="entriesOfInterest" Type="Edm.Int32" sap:label="Anzahl Einträge"/>
+                <Property Name="recipient" Type="Edm.String" MaxLength="112" sap:label="Empfänger" sap:creatable="false" sap:updatable="false"/>
+            </EntityType>
+            <EntityType Name="ZMM_ATTR_HEAD" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Zattr"/>
+                    <PropertyRef Name="Zvalue"/>
+                    <PropertyRef Name="ZdatFrom"/>
+                    <PropertyRef Name="ZdatTo"/>
+                </Key>
+                <Property Name="Zattr" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="Nome Attr."/>
+                <Property Name="Zvalue" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="Voce Attributo"/>
+                <Property Name="ZdatFrom" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Data Inizio Validità"/>
+                <Property Name="ZdatTo" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Data Fine Validità"/>
+                <Property Name="Zdescr" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Descrizione Attr."/>
+                <Property Name="Zdel" Type="Edm.String" MaxLength="1" sap:unicode="false" sap:label="Cancellazione"/>
+                <Property Name="Ernam" Type="Edm.String" MaxLength="12" sap:unicode="false" sap:label="Creato da"/>
+                <Property Name="Erdat" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Data modifica"/>
+                <Property Name="Zernam" Type="Edm.String" MaxLength="12" sap:unicode="false" sap:label="Nome utente"/>
+                <Property Name="Zerdat" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Data Modifica"/>
+            </EntityType>
+            <EntityType Name="ZMM_ATTR_POS1" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Zattr"/>
+                    <PropertyRef Name="Zvalue"/>
+                    <PropertyRef Name="Zname"/>
+                    <PropertyRef Name="Zid"/>
+                    <PropertyRef Name="ZvalueInf"/>
+                </Key>
+                <Property Name="Zattr" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="Nome Attr."/>
+                <Property Name="Zvalue" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="Voce Attributo"/>
+                <Property Name="Zname" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="Nome Attributo Corr."/>
+                <Property Name="Zid" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false"/>
+                <Property Name="ZvalueInf" Type="Edm.String" Nullable="false" MaxLength="60" sap:unicode="false"/>
+                <Property Name="Zdescr" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Descrizione Attr."/>
+                <Property Name="Ernam" Type="Edm.String" MaxLength="12" sap:unicode="false" sap:label="Creato da"/>
+                <Property Name="Erdat" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Data modifica"/>
+                <Property Name="Zernam" Type="Edm.String" MaxLength="12" sap:unicode="false" sap:label="Nome utente"/>
+                <Property Name="Zerdat" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Data Modifica"/>
+                <Property Name="Zdel" Type="Edm.String" MaxLength="1" sap:unicode="false" sap:label="Cancellazione"/>
+            </EntityType>
+            <EntityType Name="ZMM_ATTR_POS2" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Zattr"/>
+                    <PropertyRef Name="Zvalue"/>
+                    <PropertyRef Name="Zname"/>
+                    <PropertyRef Name="Zid"/>
+                    <PropertyRef Name="ZvalueInf"/>
+                </Key>
+                <Property Name="Zattr" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="Nome Attr."/>
+                <Property Name="Zvalue" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="Voce Attributo"/>
+                <Property Name="Zname" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="Nome Attributo Corr."/>
+                <Property Name="Zid" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false"/>
+                <Property Name="ZvalueInf" Type="Edm.String" Nullable="false" MaxLength="60" sap:unicode="false"/>
+                <Property Name="Zdescr" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Descrizione Attr."/>
+                <Property Name="Ernam" Type="Edm.String" MaxLength="12" sap:unicode="false" sap:label="Creato da"/>
+                <Property Name="Erdat" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Data modifica"/>
+                <Property Name="Zernam" Type="Edm.String" MaxLength="12" sap:unicode="false" sap:label="Nome utente"/>
+                <Property Name="Zerdat" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Data Modifica"/>
+                <Property Name="Zdel" Type="Edm.String" MaxLength="1" sap:unicode="false" sap:label="Cancellazione"/>
+            </EntityType>
+            <EntityContainer Name="ZATTRIBUTIANAGRAFICI_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
+                <EntitySet Name="SubscriptionCollection" EntityType="ZATTRIBUTIANAGRAFICI_SRV.Subscription" sap:content-version="1"/>
+                <EntitySet Name="NotificationCollection" EntityType="ZATTRIBUTIANAGRAFICI_SRV.Notification" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="ZMM_ATTR_HEADSet" EntityType="ZATTRIBUTIANAGRAFICI_SRV.ZMM_ATTR_HEAD" sap:searchable="true" sap:requires-filter="true" sap:content-version="1"/>
+                <EntitySet Name="ZMM_ATTR_POS1Set" EntityType="ZATTRIBUTIANAGRAFICI_SRV.ZMM_ATTR_POS1" sap:searchable="true" sap:requires-filter="true" sap:content-version="1"/>
+                <EntitySet Name="ZMM_ATTR_POS2Set" EntityType="ZATTRIBUTIANAGRAFICI_SRV.ZMM_ATTR_POS2" sap:searchable="true" sap:requires-filter="true" sap:content-version="1"/>
+            </EntityContainer>
+            <atom:link rel="self" href="http://orogeldev:44333/sap/opu/odata/sap/ZATTRIBUTIANAGRAFICI_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="latest-version" href="http://orogeldev:44333/sap/opu/odata/sap/ZATTRIBUTIANAGRAFICI_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

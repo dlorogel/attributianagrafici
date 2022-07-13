@@ -1,0 +1,7 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+	<SelectDialog title="Selezione Attributo" confirm="onVHDialogZattrClose"
+		cancel="onVHDialogZattrClose" search="onSearchZattr" showClearButton="true" items="{appModel>/zattr}"
+		multiSelect="false">
+		<StandardListItem title="{appModel>Value}" description="{appModel>Value}" type="Active"/>
+	</SelectDialog>
+</core:FragmentDefinition>
