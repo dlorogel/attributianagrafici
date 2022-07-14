@@ -70,8 +70,8 @@ sap.ui.define([
                         if (this.MapName.find(y => y.KEY === x.Zattr) !== undefined) {
                             x.Zattr = this.MapName.find(y => y.KEY === x.Zattr).VALUE;
                         }
-                        if (this.MapName.find(y => y.VALUE === oData.Zname) !== undefined) {
-                            oData.Zname = this.MapName.find(y => y.VALUE === oData.Zname).KEY;
+                        if (this.MapName.find(y => y.VALUE === x.Zname) !== undefined) {
+                            x.Zname = this.MapName.find(y => y.VALUE === x.Zname).KEY;
                         }
                         x.editable = false;
                         x.Changed = false;
@@ -224,8 +224,8 @@ sap.ui.define([
                         if (this.MapName.find(y => y.VALUE === x.Zattr) !== undefined) {
                             x.Zattr = this.MapName.find(y => y.VALUE === x.Zattr).KEY;
                         }
-                        if (this.MapName.find(y => y.VALUE === oData.Zname) !== undefined) {
-                            oData.Zname = this.MapName.find(y => y.VALUE === oData.Zname).KEY;
+                        if (this.MapName.find(y => y.VALUE === x.Zname) !== undefined) {
+                            x.Zname = this.MapName.find(y => y.VALUE === x.Zname).KEY;
                         }
                         var ModifyString = "ZMM_ATTR_POS1Set(Zattr='" + x.Zattr + "',Zvalue='" + x.Zvalue + "',Zname='" + x.Zname + "',Zid='" + x.Zid + "',ZvalueInf='" + x.ZvalueInf + "')";
                         batchChanges.push(oDataModel.createBatchOperation(encodeURIComponent(ModifyString), "PATCH", x));

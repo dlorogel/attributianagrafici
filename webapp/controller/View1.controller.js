@@ -392,10 +392,12 @@ sap.ui.define([
                 if (x.ZdatFrom > x.ZdatTo) {
                     Errori = Errori + "Data inizio validità > Data fine validità per " + x.Zattr + " " + x.Zvalue + " " + x.ZdatFrom + " " + x.ZdatTo + "\n";
                 }
+                if(this.AllResult !== undefined){
                 var find = this.AllResult.find(y => y.Zattr === x.Zattr && y.Zvalue === x.Zvalue && y.ZdatFrom === x.ZdatFrom && y.ZdatTo === x.ZdatTo);
                 if (find !== undefined) {
                     Errori = Errori + "Chiave già esistente a sistema: " + x.Zattr + " " + x.Zvalue + " " + x.ZdatFrom + " " + x.ZdatTo + "\n";
                 }
+            }
             });
             if (Errori === "") {
                 for (var i = 0; i < this.TableResult.length; i++) {
