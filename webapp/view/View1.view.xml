@@ -14,7 +14,9 @@
                             <fb:filterGroupItems>
                                 <fb:FilterGroupItem id="NomeCampoFilter" groupName="__$INTERNAL$" name="NomeCampoFilter" label="{i18n>lbl.NomeCampo}" partOfCurrentVariant="true" visibleInFilterBar="true">
                                     <fb:control>
-                                        <Input id="NomeCampoInput" class="customHeightInput" required="false" showValueHelp="false"></Input>
+                                        <Input id="NomeCampoInput" class="customHeightInput" required="false" suggestionItems="{ path: 'appModel>/zattr', sorter: { path: 'zattr' } }" valueHelpOnly="true" valueHelpRequest="onZattrVHRequestFilter" showValueHelp="true">
+                                        <core:Item key="{Zattr}"/>
+                                        </Input>
                                     </fb:control>
                                 </fb:FilterGroupItem>
                                 <fb:FilterGroupItem id="ValoreCampoFilter" groupName="__$INTERNAL$" name="ValoreCampoFilter" label="{i18n>lbl.ValoreCampo}" partOfCurrentVariant="true" visibleInFilterBar="true">
@@ -87,8 +89,8 @@
                                 <t:Column id="column1Id" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="NomeAttributo" sortProperty="NomeAttributo">
                                     <Label id="_IDGenLabel1" text="{i18n>lbl.NomeAttributo}"/>
                                     <t:template>
-                                        <Input  value="{Zattr}" suggestionItems="{ path: 'appModel>/zattr', sorter: { path: 'zattr' } }" valueHelpOnly="true" valueHelpRequest="onZattrVHRequest" showValueHelp="true" class="customHeightInput" editable="{NewRow}">
-                                            <core:Item  key="{Zattr}"/>
+                                        <Input value="{Zattr}" suggestionItems="{ path: 'appModel>/zattr', sorter: { path: 'zattr' } }" valueHelpOnly="true" valueHelpRequest="onZattrVHRequest" showValueHelp="true" class="customHeightInput" editable="{NewRow}">
+                                            <core:Item key="{Zattr}"/>
                                         </Input>
                                     </t:template>
                                 </t:Column>

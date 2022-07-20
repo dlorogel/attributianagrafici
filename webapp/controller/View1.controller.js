@@ -21,6 +21,19 @@ sap.ui.define([
                 this.CBO = [];
                 this.RowInserted = [];
                 this.RowModify = [];
+                var ListaZattr = [];
+                const oAppModel = this.getView().getModel("appModel");
+                if (oAppModel) {
+                    if (oAppModel.getProperty("/zattr") === undefined) {
+                        this.MapName.forEach(x => {
+                            var oZattr = {
+                                "Value": x.VALUE
+                            }
+                            ListaZattr.push(oZattr);
+                        });
+                        oAppModel.setProperty("/zattr", ListaZattr);
+                    }
+                }
             },
             onSearch: function () {
                 this.oComponent.busy(true);
@@ -288,8 +301,8 @@ sap.ui.define([
                         //DataFrom=DataFrom.replaceAll("-", "");
                         //var DataTo = x.ZdatTo.toISOString().split('T')[0];
                         //DataTo=DataTo.replaceAll("-", "");
-                        var DataFrom=sap.ui.model.odata.ODataUtils.formatValue(new Date(x.ZdatFrom), "Edm.DateTime");
-                        var DataTo=sap.ui.model.odata.ODataUtils.formatValue(new Date(x.ZdatTo), "Edm.DateTime");
+                        var DataFrom = sap.ui.model.odata.ODataUtils.formatValue(new Date(x.ZdatFrom), "Edm.DateTime");
+                        var DataTo = sap.ui.model.odata.ODataUtils.formatValue(new Date(x.ZdatTo), "Edm.DateTime");
                         var ModifyString = "ZMM_ATTR_HEADSet(Zattr='" + x.Zattr + "',Zvalue='" + x.Zvalue + "',ZdatFrom=" + DataFrom + ",ZdatTo=" + DataTo + ")";
                         batchChanges.push(oDataModel.createBatchOperation(encodeURIComponent(ModifyString), "PATCH", x));
                     });
@@ -309,7 +322,8 @@ sap.ui.define([
                 var header = this.getView().byId("attTableId").getContextByIndex(index).getObject();
                 this.getOwnerComponent().setHeader(header);
                 this.getOwnerComponent().getRouter().navTo("RouteView2");
-            }, onZattrVHRequest: function (oEvent) {
+            },
+            onZattrVHRequest: function (oEvent) {
                 var sInputValue = oEvent.getSource().getValue(),
                     oView = this.getView();
                 this.IndiceValueHelp = oEvent.getSource().getParent().getIndex();
@@ -329,7 +343,7 @@ sap.ui.define([
                 var sValue = oEvent.getParameter("value");
                 var oFilter = new Filter({
                     filters: [
-                        new Filter("Zattr", FilterOperator.Contains, sValue),
+                        new Filter("Value", FilterOperator.Contains, sValue),
                     ],
                     and: false
                 });
@@ -342,6 +356,27 @@ sap.ui.define([
                     oSelected.Zattr = aSelectedItems[0].getTitle();
                     this._setTableModel([]);
                     this._setTableModel(this.TableResult.concat(this.RowInserted));
+                }
+            },
+            onZattrVHRequestFilter: function (oEvent) {
+                var sInputValue = oEvent.getSource().getValue(),
+                    oView = this.getView();
+                // create value help dialog
+                this._pValueHelpDialog = Fragment.load({
+                    id: "Zattr",
+                    name: "it.orogel.attributianagrafici.view.VHDialogZattrFilter",
+                    controller: this
+                }).then(function (oValueHelpDialog) {
+                    oView.addDependent(oValueHelpDialog);
+                    return oValueHelpDialog;
+                });
+                this._pValueHelpDialog.then(function (oValueHelpDialog) {
+                    oValueHelpDialog.open(sInputValue);
+                });
+            }, onVHDialogZattrCloseFilter: function (oEvent) {
+                var aSelectedItems = oEvent.getParameter("selectedItems");
+                if (aSelectedItems && aSelectedItems.length > 0) {
+                    this.getView().byId("NomeCampoInput").setValue(aSelectedItems[0].getTitle());
                 }
             }
         });
@@ -359,16 +394,7 @@ sap.ui.define([
             //set model: concat new batch of data to previous model
             const oAppModel = this.getView().getModel("appModel");
             const oTable = this.getView().byId("attTableId");
-            var ListaZattr = [];
-            if (oAppModel.getProperty("/zattr") === undefined) {
-                this.MapName.forEach(x => {
-                    var oZattr = {
-                        "Value": x.VALUE
-                    }
-                    ListaZattr.push(oZattr);
-                });
-                oAppModel.setProperty("/zattr", ListaZattr);
-            }
+            
             oAppModel.setProperty("/rows", aResults);
             oTable.setModel(oAppModel);
             oTable.bindRows("/rows");
@@ -392,12 +418,12 @@ sap.ui.define([
                 if (x.ZdatFrom > x.ZdatTo) {
                     Errori = Errori + "Data inizio validità > Data fine validità per " + x.Zattr + " " + x.Zvalue + " " + x.ZdatFrom + " " + x.ZdatTo + "\n";
                 }
-                if(this.AllResult !== undefined){
-                var find = this.AllResult.find(y => y.Zattr === x.Zattr && y.Zvalue === x.Zvalue && y.ZdatFrom === x.ZdatFrom && y.ZdatTo === x.ZdatTo);
-                if (find !== undefined) {
-                    Errori = Errori + "Chiave già esistente a sistema: " + x.Zattr + " " + x.Zvalue + " " + x.ZdatFrom + " " + x.ZdatTo + "\n";
+                if (this.AllResult !== undefined) {
+                    var find = this.AllResult.find(y => y.Zattr === x.Zattr && y.Zvalue === x.Zvalue && y.ZdatFrom === x.ZdatFrom && y.ZdatTo === x.ZdatTo);
+                    if (find !== undefined) {
+                        Errori = Errori + "Chiave già esistente a sistema: " + x.Zattr + " " + x.Zvalue + " " + x.ZdatFrom + " " + x.ZdatTo + "\n";
+                    }
                 }
-            }
             });
             if (Errori === "") {
                 for (var i = 0; i < this.TableResult.length; i++) {

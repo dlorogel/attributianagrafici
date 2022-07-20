@@ -54,12 +54,20 @@ sap.ui.define([], function () {
             VALUE: "Calibrazione",
             LENGTH: "2"
         }, {
+            KEY: "RAGGCALIBR",
+            VALUE: "Raggruppatore Calibrazione",
+            LENGTH: "1"
+        }, {
             KEY: "STAGIONALITA",
             VALUE: "Stagionalità",
             LENGTH: "1"
         }, {
             KEY: "EVENTI",
             VALUE: "Eventi Coltivazione",
+            LENGTH: "1"
+        }, {
+            KEY: "CAR_RACTAG",
+            VALUE: "Caratteristica di raccolta e taglio",
             LENGTH: "1"
         }, {
             KEY: "SERVIZIO1",
@@ -113,10 +121,6 @@ sap.ui.define([], function () {
             KEY: "POLITICHEOP",
             VALUE: "Campo politiche OP",
             LENGTH: "3"
-        }, {
-            KEY: "POLITICHE_CONF",
-            VALUE: "Politiche conferente",
-            LENGTH: "1"
-        }]
+        },]
     };
 });

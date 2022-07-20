@@ -8,7 +8,7 @@
     <Page id="page" title="{i18n>title3}" showNavButton="true" navButtonPress=".onNavBack">
         <content>
             <OverflowToolbar id="HeaderBar">
-                <Label id="_IDGenToolbarSpacer6" text="Nome Campo" labelFor="NomeCampoInput">
+                <Label id="_IDGenToolbarSpacer6" text="Nome Attributo" labelFor="NomeCampoInput">
                     <layoutData>
                         <OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutData5" group="1" />
                     </layoutData>
@@ -19,7 +19,7 @@
                     </layoutData>
                 </Input>
                 <ToolbarSpacer id="_IDGenToolbarSpacer5" width="20px"/>
-                <Label id="_IDGenLabel21" text="Valore Campo" labelFor="ValoreCampoInput">
+                <Label id="_IDGenLabel21" text="Voce attributo" labelFor="ValoreCampoInput">
                     <layoutData>
                         <OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutData6" group="1" />
                     </layoutData>
