@@ -130,6 +130,7 @@ sap.ui.define([
                             x.Zdel = true;
                         }
                         x.NewRow = false;
+                        x.Specie = false;
                         this.CBO.push(JSON.parse(JSON.stringify(x)));
                     });
                     this._setTableModel(aResult);
@@ -157,6 +158,7 @@ sap.ui.define([
                     "ZdatFrom": null,
                     "ZdatTo": null,
                     "Zdescr": "",
+                    "Zfrove": "",
                     "Zdel": false,
                     "Ernam": "",
                     "Erdat": null,
@@ -164,7 +166,8 @@ sap.ui.define([
                     "Zerdat": null,
                     "editable": true,
                     "Changed": false,
-                    "NewRow": true
+                    "NewRow": true,
+                    "Specie":false
                 };
                 this.RowInserted.push(NewRow);
                 const oAppModel = this.getView().getModel("appModel");
@@ -176,6 +179,9 @@ sap.ui.define([
                 this.TableResult.forEach(x => {
                     if (x.Changed === true) {
                         x.editable = true;
+                        if (x.Zattr === "Specie") {
+                            x.Specie = true;
+                        }
                     }
                 });
                 this._setTableModel([]);
@@ -243,6 +249,7 @@ sap.ui.define([
                             delete oData.editable;
                             delete oData.NewRow;
                             delete oData.Changed;
+                            delete oData.Specie;
                             oData.Zdel = "";
                             if (this.MapName.find(y => y.VALUE === oData.Zattr) !== undefined) {
                                 oData.Zattr = this.MapName.find(y => y.VALUE === oData.Zattr).KEY;
@@ -354,6 +361,11 @@ sap.ui.define([
                 if (aSelectedItems && aSelectedItems.length > 0) {
                     var oSelected = this.getView().byId("attTableId").getContextByIndex(this.IndiceValueHelp).getObject();
                     oSelected.Zattr = aSelectedItems[0].getTitle();
+                    if (aSelectedItems[0].getTitle() === "Specie") {
+                        oSelected.Specie = true;
+                    }else{
+                        oSelected.Specie = false;
+                    }
                     this._setTableModel([]);
                     this._setTableModel(this.TableResult.concat(this.RowInserted));
                 }
@@ -394,7 +406,7 @@ sap.ui.define([
             //set model: concat new batch of data to previous model
             const oAppModel = this.getView().getModel("appModel");
             const oTable = this.getView().byId("attTableId");
-            
+
             oAppModel.setProperty("/rows", aResults);
             oTable.setModel(oAppModel);
             oTable.bindRows("/rows");
@@ -409,6 +421,11 @@ sap.ui.define([
             this.RowInserted.forEach(x => {
                 if (x.Zattr === "" || x.ZdatFrom === "" || x.ZdatTo === "" || x.ZdatFrom === null || x.ZdatTo === null || x.Zvalue === "") {
                     Errori = Errori + "Valorizzare i campi obbligatori\n";
+                }
+                if (x.Zattr === "Specie") {
+                    if (x.Zfrove !== "F" && x.Zfrove !== "V") {
+                        Errori = Errori + "Valorizzare il campo Frutta/Verdura\n";
+                    }
                 }
                 if (this.MapName.find(y => y.VALUE === x.Zattr) !== undefined) {
                     if (this.MapName.find(y => y.VALUE === x.Zattr).LENGTH < x.Zvalue.length) {

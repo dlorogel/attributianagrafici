@@ -15,7 +15,7 @@
                                 <fb:FilterGroupItem id="NomeCampoFilter" groupName="__$INTERNAL$" name="NomeCampoFilter" label="{i18n>lbl.NomeCampo}" partOfCurrentVariant="true" visibleInFilterBar="true">
                                     <fb:control>
                                         <Input id="NomeCampoInput" class="customHeightInput" required="false" suggestionItems="{ path: 'appModel>/zattr', sorter: { path: 'zattr' } }" valueHelpOnly="true" valueHelpRequest="onZattrVHRequestFilter" showValueHelp="true">
-                                        <core:Item key="{Zattr}"/>
+                                            <core:Item key="{Zattr}"/>
                                         </Input>
                                     </fb:control>
                                 </fb:FilterGroupItem>
@@ -116,6 +116,12 @@
                                     <Label id="_IDGenLabel6" text="{i18n>lbl.DescrizioneAttributo}"/>
                                     <t:template>
                                         <Input id="_IDGenText6" value="{Zdescr}" editable="{editable}"/>
+                                    </t:template>
+                                </t:Column>
+                                <t:Column id="_IDGenColumn11" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="Zfrove" sortProperty="Zfrove">
+                                    <Label id="_IDGenLabel12" text="{i18n>lbl.Zfrove}"/>
+                                    <t:template>
+                                        <Input id="_IDGenText12" value="{Zfrove}"  editable ="{Specie}"/>
                                     </t:template>
                                 </t:Column>
                                 <t:Column id="_IDGenColumn6" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="Cancellazione" sortProperty="Cancellazione">
