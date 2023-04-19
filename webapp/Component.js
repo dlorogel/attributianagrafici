@@ -1,16 +1,17 @@
 sap.ui.define([
     "sap/ui/core/UIComponent",
     "sap/ui/Device",
-    "it/orogel/attributianagrafici/model/models"
+    "it/orogel/attributianagrafici/model/models",
+    "sap/ui/core/routing/HashChanger"
 ],
-    function (UIComponent, Device, models) {
+    function (UIComponent, Device, models, HashChanger) {
         "use strict";
 
         const oAppComponent = UIComponent.extend("it.orogel.attributianagrafici.Component", {
             metadata: {
                 manifest: "json"
             },
-
+            oNavigation: null,
             /**
              * The component is initialized by UI5 automatically during the startup of the app and calls the init method once.
              * @public
@@ -18,6 +19,7 @@ sap.ui.define([
              */
             init: function () {
                 // call the base component's init function
+                HashChanger.getInstance().replaceHash("");
                 UIComponent.prototype.init.apply(this, arguments);
 
                 // enable routing
@@ -25,7 +27,10 @@ sap.ui.define([
 
                 // set the device model
                 this.setModel(models.createDeviceModel(), "device");
-            }
+            },
+            setNavigation: function (oNavigation) {
+                this.oNavigation = oNavigation;
+            },
         });
 
         oAppComponent.prototype.i18n = function () {

@@ -14,14 +14,18 @@
                             <fb:filterGroupItems>
                                 <fb:FilterGroupItem id="NomeCampoFilter" groupName="__$INTERNAL$" name="NomeCampoFilter" label="{i18n>lbl.NomeCampo}" partOfCurrentVariant="true" visibleInFilterBar="true">
                                     <fb:control>
-                                        <Input id="NomeCampoInput" class="customHeightInput" required="false" suggestionItems="{ path: 'appModel>/zattr', sorter: { path: 'zattr' } }" valueHelpOnly="true" valueHelpRequest="onZattrVHRequestFilter" showValueHelp="true">
+                                        <Input id="NomeCampoInput" class="customHeightInput" required="false" suggestionItems="{ path: 'appModel>/zattr', sorter: { path: 'zattr' } }" valueHelpOnly="false" valueHelpRequest="onZattrVHRequestFilter" showValueHelp="true">
                                             <core:Item key="{Zattr}"/>
                                         </Input>
                                     </fb:control>
                                 </fb:FilterGroupItem>
                                 <fb:FilterGroupItem id="ValoreCampoFilter" groupName="__$INTERNAL$" name="ValoreCampoFilter" label="{i18n>lbl.ValoreCampo}" partOfCurrentVariant="true" visibleInFilterBar="true">
                                     <fb:control>
-                                        <Input id="ValoreCampoInput" class="customHeightInput" required="false" showValueHelp="false"></Input>
+                                        <Input id="ValoreCampoInput" class="customHeightInput" required="false" suggestionItems="{appModel>/zvalue}" valueHelpOnly="false" valueHelpRequest="onZvalueVHRequestFilter" showValueHelp="true" showSuggestion="true">
+                                            <suggestionItems>
+                                                <core:Item text="{appModel>Value}"/>
+                                            </suggestionItems>
+                                        </Input>
                                     </fb:control>
                                 </fb:FilterGroupItem>
                                 <fb:FilterGroupItem id="DataDaFilter" groupName="__$INTERNAL$" name="DataDaFilter" label="{i18n>lbl.DataDa}" partOfCurrentVariant="true" visibleInFilterBar="true">
@@ -34,7 +38,18 @@
                                         <DatePicker id="DataAInput" placeholder="" change="DataAChange" class="sapUiSmallMarginBottom" showFooter="true"/>
                                     </fb:control>
                                 </fb:FilterGroupItem>
+                                <fb:FilterGroupItem id="CancellazioneFilter" groupName="__$INTERNAL$" name="CancellazioneFilter" label="{i18n>lbl.FlagCancellati}" partOfCurrentVariant="true" visibleInFilterBar="true">
+                                    <fb:control>
+                                        <CheckBox id="CancellazioneInput" class="sapUiSmallMarginBottom"/>
+                                    </fb:control>
+                                </fb:FilterGroupItem>
                             </fb:filterGroupItems>
+                            <Button id="ButtonCopiaTestata" text="Copia Testata" press="onCopiaTestata">
+                                <layoutData>
+                                    <OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutDataCopiaTestata1" shrinkable="true"
+                                                    minWidth = "50px"/>
+                                </layoutData>
+                            </Button>
                         </fb:FilterBar>
                         <OverflowToolbar id="ButtonBar">
                             <ToolbarSpacer id="_IDGenToolbarSpacer3" width="20px"/>
@@ -44,34 +59,43 @@
                                                     minWidth = "50px"/>
                                 </layoutData>
                             </Button>
-                            <ToolbarSpacer id="_IDGenToolbarSpacer1" width="135px"/>
+                            <ToolbarSpacer id="_IDGenToolbarSpacer1" width="90px"/>
                             <Button id="ButtonModifica" text="Modifica" press="onModifica">
                                 <layoutData>
                                     <OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutData2" shrinkable="true"
                                                     minWidth = "100px"/>
                                 </layoutData>
                             </Button>
-                            <ToolbarSpacer id="_IDGenToolbarSpacer2" width="135px"/>
+                            <ToolbarSpacer id="_IDGenToolbarSpacer2" width="100px"/>
                             <Button id="ButtonElimina" text="Elimina" press="onElimina">
                                 <layoutData>
                                     <OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutData3" shrinkable="true"
                                                     minWidth = "100px"/>
                                 </layoutData>
                             </Button>
-                            <ToolbarSpacer id="_IDGenToolbarSpacer5" width="135px"/>
+                            <ToolbarSpacer id="_IDGenToolbarSpacer5" width="90px"/>
                             <Button id="ButtonRipristina" text="Ripristina" press="onRipristina">
                                 <layoutData>
                                     <OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutData5" shrinkable="true"
                                                     minWidth = "100px"/>
                                 </layoutData>
                             </Button>
-                            <ToolbarSpacer id="_IDGenToolbarSpacer4" width="200px"/>
+                            <ToolbarSpacer id="_IDGenToolbarSpacer6" width="90px"/>
+                            <Button id="ButtonAnnulla" text="Annulla" press="onAnnulla">
+                                <layoutData>
+                                    <OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutData6" shrinkable="true"
+                                                    minWidth = "100px"/>
+                                </layoutData>
+                            </Button>
+                            <ToolbarSpacer id="_IDGenToolbarSpacer4" width="90px"/>
                             <Button id="ButtonSalva" text="Salva" press="onSalva">
                                 <layoutData>
                                     <OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutData4" shrinkable="true"
                                                     minWidth = "100px"/>
                                 </layoutData>
                             </Button>
+                            <ToolbarSpacer id="_IDGenToolbarSpacer7" width="100px"/>
+                            <Button id="buttonExcel" enabled="true" icon="sap-icon://excel-attachment" press="onExportToExcel" tooltip="{i18n>TooltipExcelButton}"/>
                         </OverflowToolbar>
                         <t:Table id="attTableId" rows="{appModel>/rows}" selectionMode="None" visibleRowCountMode="Auto" ariaLabelledBy="title" enableCellFilter="true">
                             <t:columns>
@@ -86,7 +110,7 @@
                                         </CheckBox>
                                     </t:template>
                                 </t:Column>
-                                <t:Column id="column1Id" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="NomeAttributo" sortProperty="NomeAttributo">
+                                <t:Column id="column1Id" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="zattr" sortProperty="zattr">
                                     <Label id="_IDGenLabel1" text="{i18n>lbl.NomeAttributo}"/>
                                     <t:template>
                                         <Input value="{Zattr}" suggestionItems="{ path: 'appModel>/zattr', sorter: { path: 'zattr' } }" valueHelpOnly="true" valueHelpRequest="onZattrVHRequest" showValueHelp="true" class="customHeightInput" editable="{NewRow}">
@@ -94,13 +118,13 @@
                                         </Input>
                                     </t:template>
                                 </t:Column>
-                                <t:Column id="_IDGenColumn1" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="VoceAttributo" sortProperty="VoceAttributo">
+                                <t:Column id="_IDGenColumn1" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="Zvalue" sortProperty="Zvalue">
                                     <Label id="_IDGenLabel2" text="{i18n>lbl.VoceAttributo}"/>
                                     <t:template>
-                                        <Input id="_IDGenText2" value="{Zvalue}" editable="{NewRow}"/>
+                                        <Input id="_IDGenText2" value="{Zvalue}" editable="{NewRow}" />
                                     </t:template>
                                 </t:Column>
-                                <t:Column id="_IDGenColumn3" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="DataInizioValidita" sortProperty="DataInizioValidita">
+                                <t:Column id="_IDGenColumn3" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="ZdatFrom" sortProperty="ZdatFrom">
                                     <Label id="_IDGenLabel4" text="{i18n>lbl.DataInizioValidita}"/>
                                     <t:template>
                                         <DatePicker id="_IDGenText4" value="{ path: 'ZdatFrom', type : 'sap.ui.model.type.Date', formatOptions: {pattern: 'dd.MM.yyyy'}}" editable="{NewRow}" />
@@ -112,43 +136,58 @@
                                         <DatePicker id="_IDGenText5" value="{ path: 'ZdatTo', type : 'sap.ui.model.type.Date', formatOptions: {pattern: 'dd.MM.yyyy'}}" editable="{NewRow}"/>
                                     </t:template>
                                 </t:Column>
-                                <t:Column id="_IDGenColumn5" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="DescrizioneAttributo" sortProperty="DescrizioneAttributo">
+
+                                <t:Column id="_IDGenColumn5" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="Zdescr" sortProperty="Zdescr">
                                     <Label id="_IDGenLabel6" text="{i18n>lbl.DescrizioneAttributo}"/>
                                     <t:template>
-                                        <Input id="_IDGenText6" value="{Zdescr}" editable="{editable}"/>
+                                        <Input id="_IDGenText6" value="{Zdescr}" editable="{editable}" submit="onChangeDescrizione" />
+                                    </t:template>
+                                </t:Column>
+                                <t:Column id="_IDGenColumn5b" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="ZdescrEst" sortProperty="ZdescrEst">
+                                    <Label id="_IDGenLabel6b" text="{i18n>lbl.DescrizioneEstesaAttributo}"/>
+                                    <t:template>
+                                        <Input id="_IDGenText6b" value="{ZdescrEst}" editable="{editable}"/>
                                     </t:template>
                                 </t:Column>
                                 <t:Column id="_IDGenColumn11" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="Zfrove" sortProperty="Zfrove">
                                     <Label id="_IDGenLabel12" text="{i18n>lbl.Zfrove}"/>
                                     <t:template>
-                                        <Input id="_IDGenText12" value="{Zfrove}"  editable ="{Specie}"/>
+                                        <!--<Input id="_IDGenText12" value="{Zfrove}"  editable ="{Specie}"/>-->
+                                        <ComboBox id="_IDGenText12"
+                                            xmlns="sap.m" value="{Zfrove}" editable="{Specie}">
+                                            <items>
+                                                <core:Item xmlns:core="sap.ui.core" key="V" text="V" id="item8"/>
+                                                <core:Item xmlns:core="sap.ui.core" key="F" text="F" id="item9"/>
+                                            </items>
+                                        </ComboBox>
                                     </t:template>
+
                                 </t:Column>
-                                <t:Column id="_IDGenColumn6" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="Cancellazione" sortProperty="Cancellazione">
+                                <t:Column id="_IDGenColumn6" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="Zdel" sortProperty="Zdel">
                                     <Label id="_IDGenLabel7" text="{i18n>lbl.Cancellazione}"/>
                                     <t:template>
                                         <CheckBox id="_IDGenText7" selected="{Zdel}"  editable ="false"/>
                                     </t:template>
                                 </t:Column>
-                                <t:Column id="_IDGenColumn7" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="CreatoDa" sortProperty="CreatoDa">
+                                <t:Column id="_IDGenColumn7" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="Ernam" sortProperty="Ernam">
                                     <Label id="_IDGenLabel8" text="{i18n>lbl.CreatoDa}"/>
                                     <t:template>
                                         <Input id="_IDGenText8" value="{Ernam}" editable="false"/>
                                     </t:template>
                                 </t:Column>
-                                <t:Column id="_IDGenColumn8" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="DataCreazione" sortProperty="DataCreazione">
+                                <t:Column id="_IDGenColumn8" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="Erdat" sortProperty="Erdat">
                                     <Label id="_IDGenLabel9" text="{i18n>lbl.DataCreazione}"/>
                                     <t:template>
                                         <DatePicker id="_IDGenText9" value="{ path: 'Erdat', type : 'sap.ui.model.type.Date', formatOptions: {pattern: 'dd.MM.yyyy'}}" editable="false"/>
                                     </t:template>
                                 </t:Column>
-                                <t:Column id="_IDGenColumn9" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="ModificatoDa" sortProperty="ModificatoDa">
+                                <t:Column id="_IDGenColumn9" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="Zernam" sortProperty="Zernam">
                                     <Label id="_IDGenLabel10" text="{i18n>lbl.ModificatoDa}"/>
                                     <t:template>
                                         <Input id="_IDGenText10" value="{Zernam}" editable="false"/>
                                     </t:template>
                                 </t:Column>
-                                <t:Column id="_IDGenColumn10" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="DataModifica" sortProperty="DataModifica">
+                                <t:Column id="_IDGenColumn10" hAlign="Begin" resizable="true" autoResizable="true" filterProperty="Zerdat" sortProperty="Zerdat">
                                     <Label id="_IDGenLabel11" text="{i18n>lbl.DataModifica}"/>
                                     <t:template>
                                         <DatePicker id="_IDGenText11" value="{ path: 'Zerdat', type : 'sap.ui.model.type.Date', formatOptions: {pattern: 'dd.MM.yyyy'}}" editable="false"/>

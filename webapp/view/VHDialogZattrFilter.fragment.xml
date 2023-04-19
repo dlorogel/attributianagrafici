@@ -2,6 +2,6 @@
 	<SelectDialog title="Selezione Attributo" confirm="onVHDialogZattrCloseFilter"
 		cancel="onVHDialogZattrCloseFilter" search="onSearchZattr" showClearButton="true" items="{appModel>/zattr}"
 		multiSelect="false">
-		<StandardListItem title="{appModel>Value}" description="{appModel>Value}" type="Active"/>
+		<StandardListItem title="{appModel>Value}" type="Active"/>
 	</SelectDialog>
 </core:FragmentDefinition>

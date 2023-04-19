@@ -1,0 +1,6 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <SelectDialog title="Selezione Specie" confirm="onVHDialogZCopiaAttributiClose" cancel="onVHDialogZCopiaAttributiClose" search="onSearchZCopiaAttributi" showClearButton="true" items="{appModel>/zcopiaspecie}" multiSelect="false">
+        <StandardListItem title="{appModel>Value} | {appModel>Descrizione}" type="Active"/>
+    </SelectDialog>
+</core:FragmentDefinition>

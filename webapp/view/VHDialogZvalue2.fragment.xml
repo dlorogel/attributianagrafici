@@ -1,0 +1,31 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <TableSelectDialog  noDataText="Non sono stati trovati suggerimenti" title="Seleziona Attributo" search="onSearchZvalue" confirm="onVHDialogZvalueClose" cancel="onVHDialogZvalueClose" items="{
+			path : 'appModel>/zvalue2'
+		}">
+        <ColumnListItem vAlign="Middle">
+            <cells>
+                <Text text="{appModel>Value}" />
+                <Text text="{appModel>Descr}" />
+                <Text text="{appModel>DescrEst}" />
+            </cells>
+        </ColumnListItem>
+        <columns>
+            <Column width="12em">
+                <header>
+                    <Text text="Attributo" />
+                </header>
+            </Column>
+            <Column width="12em">
+                <header>
+                    <Text text="Descrizione" />
+                </header>
+            </Column>
+            <Column width="12em">
+                <header>
+                    <Text text="Descrizione Estesa" />
+                </header>
+            </Column>
+        </columns>
+    </TableSelectDialog>
+</core:FragmentDefinition>

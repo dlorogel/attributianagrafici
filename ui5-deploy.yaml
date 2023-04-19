@@ -19,4 +19,4 @@ builder:
         app:
           name: ZATTANAGRAFICI
           package: Z001
-          transport: SODK900284
+          transport: SODK904197

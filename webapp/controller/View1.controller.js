@@ -5,7 +5,8 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/m/MessageBox",
     "sap/m/MessageToast",
-    "it/orogel/attributianagrafici/model/Constants"
+    "it/orogel/attributianagrafici/model/Constants",
+    "it/orogel/attributianagrafici/model/xlsx",
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
@@ -17,6 +18,8 @@ sap.ui.define([
             onInit: function () {
                 this.oComponent = this.getOwnerComponent();
                 this.MapName = Constants.ZNAME_MAP;
+                this.MapName1 = Constants.ZNAME_MAP1;
+                this.MapName2 = Constants.ZNAME_MAP2;
                 this.TableResult = [];
                 this.CBO = [];
                 this.RowInserted = [];
@@ -33,7 +36,83 @@ sap.ui.define([
                         });
                         oAppModel.setProperty("/zattr", ListaZattr);
                     }
+                    ListaZattr = [];
+                    if (oAppModel.getProperty("/zattr1") === undefined) {
+                        this.MapName1.forEach(x => {
+                            var oZattr1 = {
+                                "Value": x.VALUE
+                            }
+                            ListaZattr.push(oZattr1);
+                        });
+                        oAppModel.setProperty("/zattr1", ListaZattr);
+                    }
+                    ListaZattr = [];
+                    if (oAppModel.getProperty("/zattr2") === undefined) {
+                        this.MapName2.forEach(x => {
+                            var oZattr2 = {
+                                "Value": x.VALUE
+                            }
+                            ListaZattr.push(oZattr2);
+                        });
+                        oAppModel.setProperty("/zattr2", ListaZattr);
+                    }
+                    if (oAppModel.getProperty("/zvalue") === undefined) {
+                        const oPromiseAttributiAll = new Promise((resolve, reject) => {
+                            this.getView().getModel().read("/ZMM_ATTR_HEADSet", {
+                                success: (aData) => {
+                                    resolve(aData.results);
+                                },
+                                error: (oError) => {
+                                    reject;
+                                }
+                            });
+                        });
+                        const oPromiseDescrizioni = new Promise((resolve, reject) => {
+                            this.getView().getModel().read("/ZMM_ATTR_DESCRSet", {
+                                success: (aData) => {
+                                    resolve(aData.results);
+                                },
+                                error: (oError) => {
+                                    reject;
+                                }
+                            });
+                        });
+                        //oPromiseAttributiAll.then((aResults) => {
+                        Promise.all([oPromiseAttributiAll, oPromiseDescrizioni]).then((aResults) => {
+                            var ListaZvalue = [];
+                            let aUniqueZvalue = [...new Set(aResults[0].map(item => item.Zvalue))];
+                            aUniqueZvalue.forEach(x => {
+                                var Find = aResults[0].find(y => y.Zvalue === x);
+                                var Descrizione = "";
+                                if (Find) {
+                                    if (Find.ZdescrEst !== "") {
+                                        Descrizione = Find.ZdescrEst;
+                                    } else {
+                                        Descrizione = Find.Zdescr;
+                                    }
+                                }
+                                var oZvalue = {
+                                    "Value": x,
+                                    "Descrizione": Descrizione
+                                }
+                                ListaZvalue.push(oZvalue);
+                            });
+                            oAppModel.setProperty("/zvalue", ListaZvalue);
+                            oAppModel.setProperty("/zdescr", aResults[1]);
+                        }, oError => {
+                            MessageToast.show(this.oComponent.i18n().getText("msg.error.zattributianagrafici.text"));
+                            this.oComponent.resetAllBusy();
+                        });
+                    }
                 }
+            },
+            onSelectAll: function () {
+                const oAppModel = this.getView().getModel("appModel");
+                var Seleziona = oAppModel.getProperty("/rows");
+                Seleziona.forEach(x => {
+                    x.Changed = this.byId("selectAllCheckBoxId").getSelected();
+                });
+                oAppModel.refresh(true);
             },
             onSearch: function () {
                 this.oComponent.busy(true);
@@ -45,6 +124,7 @@ sap.ui.define([
                 this.Item = [];
                 this.NomeCampoInput = this.getView().byId("NomeCampoInput").getValue();
                 this.ValoreCampoInput = this.getView().byId("ValoreCampoInput").getValue();
+                this.CancellazioneInput = this.getView().byId("CancellazioneInput").getSelected();
                 if (this.MapName.find(y => y.VALUE === this.NomeCampoInput) !== undefined) {
                     this.NomeCampoInput = this.MapName.find(y => y.VALUE === this.NomeCampoInput).KEY;
                 }
@@ -68,6 +148,14 @@ sap.ui.define([
                         and: false
                     }));
                 };
+                let aCancellazioneFilter = [];
+                if (this.CancellazioneInput === false) {
+                    aCancellazioneFilter.push(new Filter("Zdel", FilterOperator.EQ, ""));
+                    oFinalFilter.aFilters.push(new Filter({
+                        filters: aCancellazioneFilter,
+                        and: false
+                    }));
+                }
                 if (this.DataDaInput !== undefined && this.DataDaInput !== "" && !(isNaN(this.DataDaInput))) {
                     let aDataDaInputFilter = [];
                     aDataDaInputFilter.push(new Filter("ZdatFrom", FilterOperator.GE, this.DataDaInput));
@@ -139,25 +227,40 @@ sap.ui.define([
                     this.oComponent.resetAllBusy();
                 });
             },
+            onReset: function () {
+                this.getView().byId("NomeCampoInput").setValue("");
+                this.getView().byId("ValoreCampoInput").setValue("");
+                this.getView().byId("DataDaInput").setValue("");
+                this.getView().byId("DataAInput").setValue("");
+                this.getView().byId("CancellazioneInput").setSelected(false);
+            },
             DataDaChange: function (oEvent) {
                 this.DataDaInput = this.getView().byId("DataDaInput").getValue();
-                this.DataDaInput = new Date(this.DataDaInput);
+                var dateParts = this.DataDaInput.split(".");
+                var date = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+                this.DataDaInput = new Date(date);
                 let timezone = this.DataDaInput.getTimezoneOffset() / 60;
                 this.DataDaInput.setHours(this.DataDaInput.getHours() - timezone);
             },
             DataAChange: function (oEvent) {
                 this.DataAInput = this.getView().byId("DataAInput").getValue();
-                this.DataAInput = new Date(this.DataAInput);
+                var dateParts = this.DataAInput.split(".");
+                var date = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+                this.DataAInput = new Date(date);
                 let timezone = this.DataAInput.getTimezoneOffset() / 60;
                 this.DataAInput.setHours(this.DataAInput.getHours() - timezone);
             },
             onInserisci: function () {
+                var Datafine = new Date(9999, 11, 31);
+                //let timezone = Datafine.getTimezoneOffset() / 60;
+                //Datafine.setHours(Datafine.getHours() - timezone);
                 let NewRow = {
                     "Zattr": "",
                     "Zvalue": "",
                     "ZdatFrom": null,
-                    "ZdatTo": null,
+                    "ZdatTo": Datafine,
                     "Zdescr": "",
+                    "ZdescrEst": "",
                     "Zfrove": "",
                     "Zdel": false,
                     "Ernam": "",
@@ -167,13 +270,15 @@ sap.ui.define([
                     "editable": true,
                     "Changed": false,
                     "NewRow": true,
-                    "Specie":false
+                    "Specie": false
                 };
-                this.RowInserted.push(NewRow);
+                //this.RowInserted.push(NewRow);
+                this.RowInserted.unshift(NewRow);
                 const oAppModel = this.getView().getModel("appModel");
                 const oTable = this.getView().byId("attTableId");
                 this._setTableModel([]);
-                this._setTableModel(this.TableResult.concat(this.RowInserted));
+                //this._setTableModel(this.TableResult.concat(this.RowInserted));
+                this._setTableModel(this.RowInserted.concat(this.TableResult));
             },
             onModifica: function () {
                 this.TableResult.forEach(x => {
@@ -185,9 +290,22 @@ sap.ui.define([
                     }
                 });
                 this._setTableModel([]);
-                this._setTableModel(this.TableResult.concat(this.RowInserted));
+                //this._setTableModel(this.TableResult.concat(this.RowInserted));
+                this._setTableModel(this.RowInserted.concat(this.TableResult));
             },
-
+            onCopiaTestata: function () {
+                this.NomeCampoInput = this.getView().byId("NomeCampoInput").getValue();
+                this.RowInserted.forEach(x => {
+                    if (x.Zattr === "") {
+                        x.Zattr = this.NomeCampoInput;
+                        if (this.NomeCampoInput === "Specie") {
+                            x.Specie = true;
+                        }
+                    }
+                });
+                this._setTableModel([]);
+                this._setTableModel(this.RowInserted.concat(this.TableResult));
+            },
             onElimina: function () {
                 this.TableResult.concat(this.RowInserted).forEach(x => {
                     if (x.Changed === true) {
@@ -195,7 +313,8 @@ sap.ui.define([
                     }
                 });
                 this._setTableModel([]);
-                this._setTableModel(this.TableResult.concat(this.RowInserted));
+                //this._setTableModel(this.TableResult.concat(this.RowInserted));
+                this._setTableModel(this.RowInserted.concat(this.TableResult));
             },
             onRipristina: function () {
                 this.TableResult.concat(this.RowInserted).forEach(x => {
@@ -204,7 +323,19 @@ sap.ui.define([
                     }
                 });
                 this._setTableModel([]);
-                this._setTableModel(this.TableResult.concat(this.RowInserted));
+                //this._setTableModel(this.TableResult.concat(this.RowInserted));
+                this._setTableModel(this.RowInserted.concat(this.TableResult));
+            },
+            onAnnulla: function () {
+                this.RowInserted = [];
+                for (var i = 0; i < this.TableResult.length; i++) {
+                    this.TableResult[i].Zdel = this.CBO[i].Zdel;
+                    this.TableResult[i].Zdescr = this.CBO[i].Zdescr;
+                    this.TableResult[i].ZdescrEst = this.CBO[i].ZdescrEst;
+                    this.TableResult[i].Zfrove = this.CBO[i].Zfrove;
+                }
+                this._setTableModel([]);
+                this._setTableModel(this.TableResult);
             },
             onSalva: function () {
                 this.RowDeleted = [];
@@ -246,6 +377,10 @@ sap.ui.define([
                     for (var i = 0; i < this.RowInserted.length; i++) {
                         if (this.RowInserted[i].Zdel === false) {
                             var oData = this.RowInserted[i];
+                            let timezone = oData.ZdatFrom.getTimezoneOffset() / 60;
+                            oData.ZdatFrom.setHours(oData.ZdatFrom.getHours() - timezone);
+                            timezone = oData.ZdatTo.getTimezoneOffset() / 60;
+                            oData.ZdatTo.setHours(oData.ZdatTo.getHours() - timezone);
                             delete oData.editable;
                             delete oData.NewRow;
                             delete oData.Changed;
@@ -262,8 +397,23 @@ sap.ui.define([
                     }
                     oDataModel.addBatchChangeOperations(batchChanges);
                     oDataModel.submitBatch(function (data, responseProcess) {
-                        sap.m.MessageToast.show("Successo");
-                        resolve();
+                        var success = true;
+                        if (data.hasOwnProperty('__batchResponses')) {
+                            if (data.__batchResponses[0].hasOwnProperty('__changeResponses')) {
+                                data.__batchResponses[0].__changeResponses.forEach(z => {
+                                    if (z.statusCode === "400") {
+                                        success = false;
+                                    }
+                                });
+                            }
+                        }
+                        if (success === true) {
+                            sap.m.MessageToast.show("Successo");
+                            resolve();
+                        } else {
+                            sap.m.MessageToast.show("Errore");
+                            reject();
+                        }
                     }.bind(this),
                         function (err) {
                             sap.m.MessageToast.show("Errore");
@@ -324,6 +474,11 @@ sap.ui.define([
                         });
                 }
             },
+            onChangeDescrizione: function (oEvent) {
+                var index = oEvent.getSource().getParent().getIndex();
+                var header = this.getView().byId("attTableId").getContextByIndex(index).getObject();
+                header.ZdescrEst = header.Zdescr;
+            },
             onNavToPos1: function (oEvent) {
                 var index = oEvent.getSource().getParent().getIndex();
                 var header = this.getView().byId("attTableId").getContextByIndex(index).getObject();
@@ -356,6 +511,17 @@ sap.ui.define([
                 });
                 var oBinding = oEvent.getParameter("itemsBinding");
                 oBinding.filter([oFilter]);
+            }, onSearchZvalue: function (oEvent) {
+                var sValue = oEvent.getParameter("value");
+                var oFilter = new Filter({
+                    filters: [
+                        new Filter("Value", FilterOperator.Contains, sValue),
+                        new Filter("Descrizione", FilterOperator.Contains, sValue),
+                    ],
+                    and: false
+                });
+                var oBinding = oEvent.getParameter("itemsBinding");
+                oBinding.filter([oFilter]);
             }, onVHDialogZattrClose: function (oEvent) {
                 var aSelectedItems = oEvent.getParameter("selectedItems");
                 if (aSelectedItems && aSelectedItems.length > 0) {
@@ -363,11 +529,13 @@ sap.ui.define([
                     oSelected.Zattr = aSelectedItems[0].getTitle();
                     if (aSelectedItems[0].getTitle() === "Specie") {
                         oSelected.Specie = true;
-                    }else{
+                    } else {
                         oSelected.Specie = false;
+                        oSelected.Zfrove = "";
                     }
                     this._setTableModel([]);
-                    this._setTableModel(this.TableResult.concat(this.RowInserted));
+                    //this._setTableModel(this.TableResult.concat(this.RowInserted));
+                    this._setTableModel(this.RowInserted.concat(this.TableResult));
                 }
             },
             onZattrVHRequestFilter: function (oEvent) {
@@ -390,15 +558,91 @@ sap.ui.define([
                 if (aSelectedItems && aSelectedItems.length > 0) {
                     this.getView().byId("NomeCampoInput").setValue(aSelectedItems[0].getTitle());
                 }
+            },
+            onZvalueVHRequestFilter: function (oEvent) {
+                var sInputValue = oEvent.getSource().getValue(),
+                    oView = this.getView();
+                // create value help dialog
+                this._pValueHelpDialog = Fragment.load({
+                    id: "Zvalue",
+                    name: "it.orogel.attributianagrafici.view.VHDialogZvalueFilter",
+                    controller: this
+                }).then(function (oValueHelpDialog) {
+                    oView.addDependent(oValueHelpDialog);
+                    return oValueHelpDialog;
+                });
+                this._pValueHelpDialog.then(function (oValueHelpDialog) {
+                    oValueHelpDialog.getBinding("items").filter([new Filter("Value", FilterOperator.Contains, sInputValue)]);
+                    oValueHelpDialog.open(sInputValue);
+                });
+            }, onVHDialogZvalueCloseFilter: function (oEvent) {
+                var aSelectedItems = oEvent.getParameter("selectedItems");
+                if (aSelectedItems && aSelectedItems.length > 0) {
+                    var aSelezionato = aSelectedItems[0].getTitle().split(" | ");
+                    this.getView().byId("ValoreCampoInput").setValue(aSelezionato[0]);
+                }
+            },
+            onExportToExcel: function (oEvent) {
+                /*global XLSX*/
+                const oDataExcel = [];
+                this.TableResult.forEach(y => {
+                    var del = "";
+                    if (y.Zdel === true) {
+                        del = "X";
+                    }
+                    var oAttributo = {
+                        "Nome Attributo": y.Zattr,
+                        "Voce Attributo": y.Zvalue,
+                        "Data Inizio Validita": y.ZdatFrom,
+                        "Data Fine Validita": y.ZdatTo,
+                        "Descrizione Attributo": y.Zdescr,
+                        "Descrizione Estesa Attributo": y.ZdescrEst,
+                        "Frutta/Verdura": y.Zfrove,
+                        "Cancellazione": del,
+                        "Creato Da": y.Ernam,
+                        "Data Creazione": y.Erdat,
+                        "Modificato Da": y.Zernam,
+                        "Data Modifica": y.Zerdat,
+                    };
+                    oDataExcel.push(oAttributo);
+                });
+                let wb = XLSX.utils.book_new();
+                let ws = XLSX.utils.json_to_sheet(oDataExcel);
+                var wscols = [{
+                    wch: 20
+                }, {
+                    wch: 20
+                }, {
+                    wch: 20
+                }, {
+                    wch: 20
+                }, {
+                    wch: 20
+                }, {
+                    wch: 20
+                }, {
+                    wch: 20
+                }, {
+                    wch: 20
+                }, {
+                    wch: 20
+                }, {
+                    wch: 20
+                }, {
+                    wch: 20
+                }];
+                ws['!cols'] = wscols;
+                XLSX.utils.book_append_sheet(wb, ws, "Attributi");
+                XLSX.writeFile(wb, this.getView().getModel("i18n").getResourceBundle().getText("title") + ".xlsx");
             }
         });
 
         /**
- * Set table model 
- * ---------------
- * @param aProducts - products
- * @private
- */
+        * Set table model 
+        * ---------------
+        * @param aProducts - products
+        * @private
+        */
         oAppController.prototype._setTableModel = function (aResults) {
             if (this.TableResult.length === 0 && this.RowInserted.length === 0) {
                 this.TableResult = aResults;
@@ -406,7 +650,6 @@ sap.ui.define([
             //set model: concat new batch of data to previous model
             const oAppModel = this.getView().getModel("appModel");
             const oTable = this.getView().byId("attTableId");
-
             oAppModel.setProperty("/rows", aResults);
             oTable.setModel(oAppModel);
             oTable.bindRows("/rows");
@@ -418,7 +661,10 @@ sap.ui.define([
             this.oComponent.resetAllBusy();
         };
         oAppController.prototype._controlloErrori = function (Errori) {
+            const oAppModel = this.getView().getModel("appModel");
+            var MapDescrizione = oAppModel.getProperty("/zdescr");
             this.RowInserted.forEach(x => {
+                x.Zvalue=x.Zvalue.toUpperCase();
                 if (x.Zattr === "" || x.ZdatFrom === "" || x.ZdatTo === "" || x.ZdatFrom === null || x.ZdatTo === null || x.Zvalue === "") {
                     Errori = Errori + "Valorizzare i campi obbligatori\n";
                 }
@@ -427,16 +673,34 @@ sap.ui.define([
                         Errori = Errori + "Valorizzare il campo Frutta/Verdura\n";
                     }
                 }
+                var ZattrKey = "";
                 if (this.MapName.find(y => y.VALUE === x.Zattr) !== undefined) {
-                    if (this.MapName.find(y => y.VALUE === x.Zattr).LENGTH < x.Zvalue.length) {
+                    ZattrKey = this.MapName.find(y => y.VALUE === x.Zattr).KEY;
+                }
+                if (MapDescrizione.find(y => y.Zattr === ZattrKey) !== undefined) {
+                    if (MapDescrizione.find(y => y.Zattr === ZattrKey).Zlung < x.Zdescr.length) {
+                        Errori = Errori + "Descrizione breve non ammessa perchè troppo lunga per " + x.Zattr + " " + x.Zvalue + " " + x.ZdatFrom + " " + x.ZdatTo + ".Il numero massimo di caratteri  è" + MapDescrizione.find(y => y.Zattr === ZattrKey).Zlung + "\n";
+                    }
+                }
+                if (this.MapName.find(y => y.VALUE === x.Zattr) !== undefined) {
+                    /*if (this.MapName.find(y => y.VALUE === x.Zattr).LENGTH < x.Zvalue.length) {
                         Errori = Errori + "Valore non ammesso perchè troppo lungo per " + x.Zattr + " " + x.Zvalue + " " + x.ZdatFrom + " " + x.ZdatTo + "\n";
+                    }*/
+                    if (this.MapName.find(y => y.VALUE === x.Zattr).LENGTH !== x.Zvalue.length) {
+                        Errori = Errori + "Il codice inserito non è della lunghezza corretta per " + x.Zattr + " " + x.Zvalue + " " + x.ZdatFrom + " " + x.ZdatTo + "\n";
                     }
                 }
                 if (x.ZdatFrom > x.ZdatTo) {
                     Errori = Errori + "Data inizio validità > Data fine validità per " + x.Zattr + " " + x.Zvalue + " " + x.ZdatFrom + " " + x.ZdatTo + "\n";
                 }
                 if (this.AllResult !== undefined) {
-                    var find = this.AllResult.find(y => y.Zattr === x.Zattr && y.Zvalue === x.Zvalue && y.ZdatFrom === x.ZdatFrom && y.ZdatTo === x.ZdatTo);
+                    var ControlFrom = new Date(x.ZdatFrom);
+                    var ControlTo = new Date(x.ZdatTo);
+                    let timezone = ControlFrom.getTimezoneOffset() / 60;
+                    ControlFrom.setHours(ControlFrom.getHours() - timezone);
+                    timezone = ControlTo.getTimezoneOffset() / 60;
+                    ControlTo.setHours(ControlTo.getHours() - timezone);
+                    var find = this.AllResult.find(y => y.Zattr === x.Zattr && y.Zvalue === x.Zvalue && y.ZdatFrom.getTime() === ControlFrom.getTime() && y.ZdatTo.getTime() === ControlTo.getTime());
                     if (find !== undefined) {
                         Errori = Errori + "Chiave già esistente a sistema: " + x.Zattr + " " + x.Zvalue + " " + x.ZdatFrom + " " + x.ZdatTo + "\n";
                     }
@@ -452,6 +716,7 @@ sap.ui.define([
                     delete this.TableResult[i].editable;
                     delete this.TableResult[i].NewRow;
                     delete this.TableResult[i].Changed;
+                    delete this.TableResult[i].Specie;
                     if (this.CBO[i].Zdel === false) {
                         this.CBO[i].Zdel = "";
                     } else if (this.CBO[i].Zdel === true) {
@@ -460,6 +725,7 @@ sap.ui.define([
                     delete this.CBO[i].editable;
                     delete this.CBO[i].NewRow;
                     delete this.CBO[i].Changed;
+                    delete this.CBO[i].Specie;
                     if (JSON.stringify(this.TableResult[i]) !== JSON.stringify(this.CBO[i])) {
                         this.RowModify.push(this.TableResult[i]);
                     }

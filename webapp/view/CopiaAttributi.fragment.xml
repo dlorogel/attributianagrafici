@@ -1,0 +1,24 @@
+<c:FragmentDefinition xmlns="sap.m"
+    xmlns:c="sap.ui.core">
+    <Dialog title="Copia Attributi " contentHeight="7rem" contentWidth="30rem">
+        <FlexBox alignItems="Center">
+            <VBox>
+                <items>
+                    <HBox>
+                        <Label text="Da:" labelFor="Specie Da" class="sapUiSmallMarginTop sapUiSmallMarginBegin"></Label>
+                        <ToolbarSpacer width="2rem"/>
+                        <Input type="Text" value="{appModel>/CopiaDa}" description="{appModel>/CopiaDaDescription}" editable="false" class="sapUiTinyMarginTop"/>
+                        <ToolbarSpacer width="4rem"/>
+                        <Label text="A:" labelFor="iNote1" class="sapUiSmallMarginTop"></Label>
+                        <ToolbarSpacer width="2rem"/>
+                        <Input type="Text" value="{appModel>/CopiaA}" description="{appModel>/CopiaADescription}" showValueHelp="true" valueHelpOnly="false" valueHelpRequest=".onValueHelpCopiaAttributi" class="sapUiTinyMarginTop sapUiSmallMarginEnd" width="70%"/>
+                    </HBox>
+                </items>
+                <HBox justifyContent="Center">
+                    <Button text="Annulla" type="Emphasized" press="onCloseCopiaAttributi" class="sapUiLargeMarginBeginEnd" />
+                    <Button text="Salva" type="Emphasized" press="onSalvaCopiaAttributi" class="sapUiLargeMarginBeginEnd" />
+                </HBox>
+            </VBox>
+        </FlexBox>
+    </Dialog>
+</c:FragmentDefinition>
